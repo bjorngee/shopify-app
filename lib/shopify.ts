@@ -11,12 +11,20 @@ export async function shopifyFetch({
   const endpoint = `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2023-10/graphql.json`
   const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN
 
+  if (!endpoint.includes("myshopify.com") || !key) {
+    console.error("Missing Shopify configuration. Please check your environment variables.")
+    return {
+      status: 500,
+      error: "Shopify configuration missing",
+    }
+  }
+
   try {
     const result = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Shopify-Storefront-Access-Token": key!,
+        "X-Shopify-Storefront-Access-Token": key,
       },
       body: JSON.stringify({ query, variables }),
       next: {
@@ -32,6 +40,7 @@ export async function shopifyFetch({
     const data = await result.json()
 
     if (data.errors) {
+      console.error("Shopify GraphQL errors:", data.errors)
       throw new Error(data.errors[0].message)
     }
 
