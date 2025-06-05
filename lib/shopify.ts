@@ -41,6 +41,8 @@ export async function shopifyFetch({
 
     const data = await result.json()
 
+    console.log('data:', data)
+
     if (data.errors) {
       console.error("Shopify GraphQL errors:", data.errors)
       throw new Error(data.errors[0].message)
