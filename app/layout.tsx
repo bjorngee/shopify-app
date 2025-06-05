@@ -1,10 +1,18 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type React from "react"
+import type { Metadata } from "next"
+import "./globals.css"
+import { CartProvider } from "@/lib/cart-context"
+import { CartDrawer } from "@/components/cart-drawer"
+import { ThemeProvider } from "@/components/theme-provider"
+import { SkeletonProvider } from "@/lib/skeleton-theme"
+import { Inter } from "next/font/google"
+
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: "Modern Shopify Storefront",
+  description: "A modern, headless Shopify storefront built with Next.js",
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -14,7 +22,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={inter.className}>
+        <SkeletonProvider>
+          <CartProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+              {children}
+              <CartDrawer />
+            </ThemeProvider>
+          </CartProvider>
+        </SkeletonProvider>
+      </body>
     </html>
   )
 }

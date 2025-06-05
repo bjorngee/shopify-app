@@ -2,6 +2,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { getAllProducts } from "@/lib/shopify"
+import { FeaturedProductsSkeleton } from "@/components/skeletons/featured-products-skeleton"
+import { Suspense } from "react"
 
 // Type definitions for Shopify products
 interface ShopifyProduct {
@@ -37,10 +39,24 @@ interface ShopifyProduct {
   }
 }
 
-export async function FeaturedProducts() {
+async function FeaturedProductsContent() {
+  // Add debug logging
+  console.log("=== FEATURED PRODUCTS DEBUG ===")
+  console.log("Environment:", process.env.NODE_ENV)
+  console.log("Store Domain:", process.env.SHOPIFY_STORE_DOMAIN)
+  console.log("Access Token:", process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN ? "SET" : "MISSING")
+
   // Fetch real products from Shopify
   const productsResponse = await getAllProducts()
+  console.log("Products Response Status:", productsResponse.status)
+  console.log("Products Response Error:", productsResponse.error)
+
   const products = productsResponse.body?.data?.products?.edges || []
+  console.log("Products Found:", products.length)
+
+  if (products.length > 0) {
+    console.log("First Product:", products[0].node.title)
+  }
 
   // If no products, show a message
   if (products.length === 0) {
@@ -119,5 +135,13 @@ export async function FeaturedProducts() {
         </div>
       </div>
     </section>
+  )
+}
+
+export function FeaturedProducts() {
+  return (
+    <Suspense fallback={<FeaturedProductsSkeleton />}>
+      <FeaturedProductsContent />
+    </Suspense>
   )
 }

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useCart } from "@/lib/cart-context"
 
 interface ProductDetailsProps {
   product: {
@@ -65,11 +66,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     currency: currencyCode,
   }).format(price)
 
-  const handleAddToCart = () => {
+  const { addItem, isLoading } = useCart()
+
+  const handleAddToCart = async () => {
     if (selectedVariant) {
-      // Redirect to Shopify checkout with the selected variant
-      const checkoutUrl = `https://${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || process.env.SHOPIFY_STORE_DOMAIN}/cart/${selectedVariant.id}:1`
-      window.open(checkoutUrl, "_blank")
+      await addItem(selectedVariant.id, 1)
     }
   }
 
@@ -172,8 +173,13 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         ))}
 
         <div className="mt-10 flex sm:flex-col1">
-          <Button onClick={handleAddToCart} disabled={!selectedVariant?.availableForSale} size="lg" className="w-full">
-            {selectedVariant?.availableForSale ? "Add to Cart" : "Out of Stock"}
+          <Button
+            onClick={handleAddToCart}
+            disabled={!selectedVariant?.availableForSale || isLoading}
+            size="lg"
+            className="w-full"
+          >
+            {isLoading ? "Adding..." : selectedVariant?.availableForSale ? "Add to Cart" : "Out of Stock"}
           </Button>
         </div>
       </div>

@@ -11,9 +11,9 @@ export default function AdminPage() {
   const [isClearing, setIsClearing] = useState(false)
   const [message, setMessage] = useState("")
   const [secret, setSecret] = useState("")
+  const [debugInfo, setDebugInfo] = useState<any>(null)
 
   const clearCache = async () => {
-    console.log("secret:", secret)
     if (!secret) {
       setMessage("Please enter the revalidation secret")
       return
@@ -21,9 +21,10 @@ export default function AdminPage() {
 
     setIsClearing(true)
     setMessage("")
+    setDebugInfo(null)
 
     try {
-      const response = await fetch(`/api/revalidate?secret=${secret}`, {
+      const response = await fetch(`/api/revalidate?secret=${encodeURIComponent(secret)}`, {
         method: "GET",
       })
 
@@ -31,13 +32,28 @@ export default function AdminPage() {
 
       if (response.ok) {
         setMessage("✅ Cache cleared successfully! New products should appear now.")
+        setDebugInfo(data)
       } else {
         setMessage(`❌ Error: ${data.message}`)
+        setDebugInfo(data.debug || data)
       }
     } catch (error) {
-      setMessage(`❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`)
+      setMessage(`❌ Network Error: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsClearing(false)
+    }
+  }
+
+  const testConnection = async () => {
+    try {
+      const response = await fetch("/api/revalidate?secret=test", {
+        method: "GET",
+      })
+      const data = await response.json()
+      setDebugInfo(data)
+      setMessage("Connection test completed - check debug info below")
+    } catch (error) {
+      setMessage(`❌ Connection Error: ${error instanceof Error ? error.message : "Unknown error"}`)
     }
   }
 
@@ -63,16 +79,24 @@ export default function AdminPage() {
                   </label>
                   <Input
                     id="secret"
-                    type="password"
+                    type="text"
                     placeholder="Enter your SHOPIFY_REVALIDATION_SECRET"
                     value={secret}
                     onChange={(e) => setSecret(e.target.value)}
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    This should match the SHOPIFY_REVALIDATION_SECRET environment variable
+                  </p>
                 </div>
 
-                <Button onClick={clearCache} disabled={isClearing || !secret}>
-                  {isClearing ? "Clearing Cache..." : "Clear Cache"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={clearCache} disabled={isClearing || !secret}>
+                    {isClearing ? "Clearing Cache..." : "Clear Cache"}
+                  </Button>
+                  <Button variant="outline" onClick={testConnection}>
+                    Test Connection
+                  </Button>
+                </div>
               </div>
 
               {message && (
@@ -82,6 +106,13 @@ export default function AdminPage() {
                   }`}
                 >
                   {message}
+                </div>
+              )}
+
+              {debugInfo && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                  <h4 className="font-medium text-gray-900 mb-2">Debug Information:</h4>
+                  <pre className="text-xs text-gray-600 overflow-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
                 </div>
               )}
             </div>
@@ -96,6 +127,26 @@ export default function AdminPage() {
                 <div className="flex justify-between">
                   <span>Environment:</span>
                   <span className="font-mono">{process.env.NODE_ENV}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-medium mb-4">Quick Setup Guide</h3>
+              <div className="space-y-3 text-sm text-gray-600">
+                <div>
+                  <strong>1. Set Environment Variable:</strong>
+                  <code className="block bg-gray-100 p-2 mt-1 rounded">
+                    SHOPIFY_REVALIDATION_SECRET=your-secret-here
+                  </code>
+                </div>
+                <div>
+                  <strong>2. In Vercel Dashboard:</strong>
+                  <p>Go to Settings → Environment Variables → Add the same secret</p>
+                </div>
+                <div>
+                  <strong>3. Redeploy:</strong>
+                  <p>After adding environment variables, redeploy your app</p>
                 </div>
               </div>
             </div>

@@ -5,10 +5,14 @@ import Link from "next/link"
 import { Search, ShoppingBag, Menu, X, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useCart } from "@/lib/cart-context"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+
+  const { cart, openCart } = useCart()
+  const itemCount = cart?.totalQuantity || 0
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -51,11 +55,13 @@ export function Header() {
             <Button variant="ghost" size="icon">
               <User className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" onClick={openCart}>
               <ShoppingBag className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
             </Button>
           </div>
         </div>

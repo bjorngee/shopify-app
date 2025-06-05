@@ -2,6 +2,8 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getAllProducts } from "@/lib/shopify"
+import { ProductGridSkeleton } from "@/components/skeletons/product-card-skeleton"
+import { Suspense } from "react"
 
 interface ShopifyProduct {
   node: {
@@ -36,10 +38,17 @@ interface ShopifyProduct {
   }
 }
 
-export async function AllProducts() {
+async function AllProductsContent() {
+  // Add debug logging
+  console.log("=== ALL PRODUCTS DEBUG ===")
+
   // Fetch all products from Shopify
   const productsResponse = await getAllProducts()
+  console.log("All Products Response:", productsResponse.status)
+  console.log("All Products Error:", productsResponse.error)
+
   const products = productsResponse.body?.data?.products?.edges || []
+  console.log("All Products Count:", products.length)
 
   // If no products, show a message
   if (products.length === 0) {
@@ -129,5 +138,13 @@ export async function AllProducts() {
         </div>
       )}
     </>
+  )
+}
+
+export function AllProducts() {
+  return (
+    <Suspense fallback={<ProductGridSkeleton count={12} />}>
+      <AllProductsContent />
+    </Suspense>
   )
 }
