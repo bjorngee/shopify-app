@@ -3,10 +3,12 @@ export async function shopifyFetch({
   query,
   variables,
   tags,
+  revalidate = 60, // Default 1 minute cache
 }: {
   query: string
   variables?: any
   tags?: string[]
+  revalidate?: number | false
 }) {
   const endpoint = `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2023-10/graphql.json`
   const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN
@@ -29,7 +31,7 @@ export async function shopifyFetch({
       body: JSON.stringify({ query, variables }),
       next: {
         tags: tags || ["shopify"],
-        revalidate: 3600, // Cache for 1 hour
+        revalidate: process.env.NODE_ENV === "development" ? 0 : revalidate, // No cache in dev
       },
     })
 
@@ -43,6 +45,8 @@ export async function shopifyFetch({
       console.error("Shopify GraphQL errors:", data.errors)
       throw new Error(data.errors[0].message)
     }
+
+    console.log(`Shopify API called successfully. Products found: ${data.data?.products?.edges?.length || "N/A"}`)
 
     return {
       status: result.status,
@@ -97,6 +101,7 @@ export async function getAllProducts() {
       }
     }`,
     tags: ["products"],
+    revalidate: 30, // Cache for 30 seconds
   })
 }
 
@@ -237,5 +242,6 @@ export async function getNewProducts() {
       }
     }`,
     tags: ["products", "new-products"],
+    revalidate: 30, // Cache for 30 seconds
   })
 }
