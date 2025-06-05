@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [secret, setSecret] = useState("")
 
   const clearCache = async () => {
+    console.log("secret:", secret)
     if (!secret) {
       setMessage("Please enter the revalidation secret")
       return
