@@ -1,4 +1,3 @@
-import { Suspense } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { AllProducts } from "@/components/all-products"
@@ -12,9 +11,7 @@ export default function AllProductsPage() {
           <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">All Products</h1>
           <p className="mt-4 text-lg text-gray-500">Discover our complete collection of premium products</p>
         </div>
-        <Suspense fallback={<div className="h-96 animate-pulse bg-gray-100 rounded-lg" />}>
-          <AllProducts />
-        </Suspense>
+        <AllProducts />
       </main>
       <Footer />
     </div>

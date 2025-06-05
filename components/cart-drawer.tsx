@@ -2,7 +2,6 @@
 import { X, Plus, Minus, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/lib/cart-context"
-import { CartSkeleton } from "@/components/skeletons/cart-skeleton"
 
 export function CartDrawer() {
   const { cart, isOpen, isLoading, closeCart, updateItem, removeItem } = useCart()
@@ -38,7 +37,18 @@ export function CartDrawer() {
           {/* Cart Content */}
           <div className="flex-1 overflow-y-auto px-4 py-6">
             {isLoading ? (
-              <CartSkeleton />
+              <div className="space-y-6">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="flex space-x-4 animate-pulse">
+                    <div className="h-16 w-16 bg-gray-200 rounded-md" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-200 rounded w-1/2" />
+                      <div className="h-4 bg-gray-200 rounded w-1/4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : !cart || cart.lines.edges.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center text-center">
                 <ShoppingBag className="h-12 w-12 text-gray-400 mb-4" />

@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation"
-import { Suspense } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ProductDetails } from "@/components/product-details"
-import { ProductDetailSkeleton } from "@/components/skeletons/product-detail-skeleton"
 import { getProduct } from "@/lib/shopify"
 
 interface ProductPageProps {
@@ -24,9 +22,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div className="min-h-screen bg-white">
       <Header />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Suspense fallback={<ProductDetailSkeleton />}>
-          <ProductDetails product={product} />
-        </Suspense>
+        <ProductDetails product={product} />
       </main>
       <Footer />
     </div>

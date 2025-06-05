@@ -2,8 +2,6 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getAllProducts } from "@/lib/shopify"
-import { ProductGridSkeleton } from "@/components/skeletons/product-card-skeleton"
-import { Suspense } from "react"
 
 interface ShopifyProduct {
   node: {
@@ -38,7 +36,7 @@ interface ShopifyProduct {
   }
 }
 
-async function AllProductsContent() {
+export async function AllProducts() {
   // Add debug logging
   console.log("=== ALL PRODUCTS DEBUG ===")
 
@@ -138,13 +136,5 @@ async function AllProductsContent() {
         </div>
       )}
     </>
-  )
-}
-
-export function AllProducts() {
-  return (
-    <Suspense fallback={<ProductGridSkeleton count={12} />}>
-      <AllProductsContent />
-    </Suspense>
   )
 }

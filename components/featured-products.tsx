@@ -2,8 +2,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { getAllProducts } from "@/lib/shopify"
-import { FeaturedProductsSkeleton } from "@/components/skeletons/featured-products-skeleton"
-import { Suspense } from "react"
 
 // Type definitions for Shopify products
 interface ShopifyProduct {
@@ -39,7 +37,7 @@ interface ShopifyProduct {
   }
 }
 
-async function FeaturedProductsContent() {
+export async function FeaturedProducts() {
   // Add debug logging
   console.log("=== FEATURED PRODUCTS DEBUG ===")
   console.log("Environment:", process.env.NODE_ENV)
@@ -135,13 +133,5 @@ async function FeaturedProductsContent() {
         </div>
       </div>
     </section>
-  )
-}
-
-export function FeaturedProducts() {
-  return (
-    <Suspense fallback={<FeaturedProductsSkeleton />}>
-      <FeaturedProductsContent />
-    </Suspense>
   )
 }
