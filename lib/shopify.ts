@@ -196,3 +196,46 @@ export async function getCollectionProducts(handle: string) {
     tags: ["collections", `collection-${handle}`],
   })
 }
+
+export async function getNewProducts() {
+  return shopifyFetch({
+    query: `{
+      products(sortKey: CREATED_AT, reverse: true, first: 50) {
+        edges {
+          node {
+            id
+            title
+            description
+            handle
+            createdAt
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                  altText
+                  width
+                  height
+                }
+              }
+            }
+            variants(first: 1) {
+              edges {
+                node {
+                  id
+                  availableForSale
+                }
+              }
+            }
+          }
+        }
+      }
+    }`,
+    tags: ["products", "new-products"],
+  })
+}
